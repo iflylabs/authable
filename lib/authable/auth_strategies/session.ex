@@ -23,10 +23,11 @@ defmodule Authable.AuthStrategy.Session do
   end
 
   defp authenticate_via_session(conn, session_auth, required_scopes) do
+    [subdomain | _] = String.split(conn.host, ".")
     Enum.find_value(session_auth, fn {key, module} ->
       session_value = conn |> fetch_session |> get_session(key)
       if !is_nil(session_value) do
-        module.authenticate(session_value, required_scopes)
+        module.authenticate(subdomain, session_value, required_scopes)
       end
     end)
   end

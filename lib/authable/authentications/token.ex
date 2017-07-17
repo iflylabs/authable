@@ -30,9 +30,10 @@ defmodule Authable.Authentication.Token do
       Authable.Authentication.Token.authenticate({"confirmation_token",
         "ct123456789"}, ["read", "write"])
   """
-  def authenticate({token_name, token_value}, required_scopes) do
+  def authenticate(subdomain, {token_name, token_value}, required_scopes) do
+    source = "tokens_" <> subdomain
     token_check(
-      @repo.get_by(@token_store, value: token_value, name: token_name),
+      @repo.get_by({source, @token_store}, value: token_value, name: token_name),
       required_scopes
     )
   end
