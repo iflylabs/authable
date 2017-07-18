@@ -33,21 +33,23 @@ defmodule Authable.Authentication.Token do
   def authenticate(subdomain, {token_name, token_value}, required_scopes) do
     source = "tokens_" <> subdomain
     token_check(
+      subdomain,
       @repo.get_by({source, @token_store}, value: token_value, name: token_name),
       required_scopes
     )
   end
 
-  defp token_check(nil, _),
+  defp token_check(subdomain, nil, _),
     do: AuthenticationError.invalid_token("Token not found.")
-  defp token_check(token, required_scopes) do
+  defp token_check(subdomain, token, required_scopes) do
     if @token_store.is_expired?(token) do
       AuthenticationError.invalid_token("Token expired.")
     else
       scopes = Authable.Utils.String.comma_split(token.details["scope"])
       if Authable.Utils.List.subset?(scopes, required_scopes) do
+        source = "users_" <> subdomain
         resource_owner_check(
-          @repo.get(@resource_owner, token.user_id)
+          @repo.get({source, @resource_owner}, token.user_id)
         )
       else
         AuthenticationError.insufficient_scope(required_scopes)
