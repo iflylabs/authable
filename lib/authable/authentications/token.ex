@@ -49,7 +49,7 @@ defmodule Authable.Authentication.Token do
       if Authable.Utils.List.subset?(scopes, required_scopes) do
         source = "users_" <> subdomain
         resource_owner_check(
-          @repo.get({source, @resource_owner}, token.user_id)
+          @repo.get_by({source, @resource_owner}, id: token.user_id)
         )
       else
         AuthenticationError.insufficient_scope(required_scopes)
