@@ -31,7 +31,7 @@ defmodule Authable.Authentication.Token do
         "ct123456789"}, ["read", "write"])
   """
   def authenticate(subdomain, {token_name, token_value}, required_scopes) do
-    source = "tokens_" <> subdomain
+    source = "ifly_tokens_" <> subdomain
     token_check(
       subdomain,
       @repo.get_by({source, @token_store}, value: token_value, name: token_name),
@@ -47,7 +47,7 @@ defmodule Authable.Authentication.Token do
     else
       scopes = Authable.Utils.String.comma_split(token.details["scope"])
       if Authable.Utils.List.subset?(scopes, required_scopes) do
-        source = "users_" <> subdomain
+        source = "ifly_users_" <> subdomain
         resource_owner_check(
           @repo.get_by({source, @resource_owner}, id: token.user_id)
         )
